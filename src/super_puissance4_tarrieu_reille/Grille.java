@@ -12,11 +12,20 @@ package super_puissance4_tarrieu_reille;
 public class Grille {
     Cellule [][] cellules = new Cellule [7][6];//tableau au format [nbcolonne][nblignes] ... (7 colonnes / 6 lignes)
     //variables invariantes, 
+    
+    
     public static final String ANSI_BLACK = "\u001B[30m";//coresspondent à la couleur du texte affiché dans afficherGrilleSurConsole()
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_YELLOW = "\u001B[33m";
     public static final String ANSI_BLUE = "\u001B[34m";
 
+    public Grille(){
+        for(int i=0; i<7; i++){
+            for(int j=0;j<6;j++){
+                cellules[i][j] = new Cellule();
+            }
+        }
+    }
     
     public boolean ajouterJetonDansColonne(Jeton unJeton, int colonne){
         // ajoute le jeton dans la colonne ciblée sur la cellule la plus basse et renvoie true
@@ -65,7 +74,7 @@ public class Grille {
                     System.out.print(ANSI_RED + "O" + ANSI_BLACK);
                 }else if("jaune".equals(cellules[i][j].lireCouleurDuJeton())){
                     System.out.print(ANSI_YELLOW + "O" + ANSI_BLACK);  
-                }else if(cellules[i][j] == null){
+                }else if(cellules[i][j].jetonCourant == null){
                     System.out.print(ANSI_BLUE + "O" + ANSI_BLACK);
                 }else if(cellules[i][j].presenceTrouNoir()){
                     System.out.print(ANSI_BLACK + "O" + ANSI_BLACK);

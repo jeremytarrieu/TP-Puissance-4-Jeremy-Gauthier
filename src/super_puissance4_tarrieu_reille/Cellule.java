@@ -14,7 +14,7 @@ public class Cellule {
     Jeton jetonCourant;//Jeton occupant la cellule
     boolean trouNoir, desintegrateur;
     
-    public Cellule(){// constructeur avec le jeton en argument
+    public Cellule(){
         jetonCourant = null;
         trouNoir = false;
         desintegrateur = false;

@@ -15,6 +15,12 @@ public class Jeton {
     public Jeton(String jauneOuRouge){//constructeur de la classe Jeton
         couleur = jauneOuRouge;
     }
+
+    public Jeton(){//constructeur de la classe Jeton
+        couleur = null;
+    }    
+    
+    
     public String lireCouleur(){
         return couleur;
     }
