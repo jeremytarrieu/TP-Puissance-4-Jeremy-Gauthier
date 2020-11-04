@@ -23,10 +23,9 @@ public class Partie {
         // répartis les trous noirs et les desintegrateurs
         Random rd = new Random();
         
-        
         nouvelleGrille.viderGrille(); // on vide la grille
         
-        for(int i = 0; i<41; i++){
+        for(int i = 0; i<42; i++){
             if(i<21){ // ajout de 21 jetons du joueur 1
                 joueurCourant = ListeJoueurs[0];//on définie le joueur courant
                 String couleur = joueurCourant.couleur;//on isole la couleur du joueur...
@@ -35,23 +34,28 @@ public class Partie {
             }else{//même démarche pour le deuxième joueur
                 joueurCourant = ListeJoueurs[1];
                 String couleur = joueurCourant.couleur;
-                joueurCourant.ListeJetons[i] = new Jeton(couleur);
-                joueurCourant.ajouterJeton(joueurCourant.ListeJetons[i]);
+                joueurCourant.ListeJetons[i-21] = new Jeton(couleur);
+                joueurCourant.ajouterJeton(joueurCourant.ListeJetons[i-21]);
             }
         }
     }
     public void débuterPartie(){
         
-        initialiserPartie();
-        boolean victoire = false; 
+        boolean finPartie = false; 
+        Joueur joueurGagnant;
         Random r = new Random();
-        Scanner sc = new Scanner(System.in);
+        Scanner sc;
         
         for(int i = 0; i <2; i++){// Saisie des noms des joueurs 
             System.out.print("Saisisez le nom du joueur "+(i+1)+": ");// saisie du nom des joueurs
-            ListeJoueurs[i].nom = sc.nextLine();// affectation du nom à l'objet joueur 
+            sc = new Scanner(System.in);
+            ListeJoueurs[i] = new Joueur(sc.nextLine());
         }
-        while(victoire == false){//tant qu'il n'y a pas de victoire on continue de jouer des tours 
+        
+        attribuerCouleurAuxJoueurs();
+        initialiserPartie();
+        
+        while(finPartie == false){//tant que la partie n'est pas finie on continue de jouer des tours 
             for(int i = 0; i<2; i++){// joue le tour pour chaque joueur(deux actions par tour, une par joueur)
                 
                 joueurCourant = ListeJoueurs[i];// On définit le joueur courant pour son tour, 1 ou 2
@@ -60,11 +64,22 @@ public class Partie {
                 nouvelleGrille.afficherGrilleSurConsole();//on affiche la grille de jeu
                 System.out.println("\t"+ListeJoueurs[i].nom+" entrez le n° de la colonne à jouer : ");
                 
-                int colonne = (sc.nextInt() + 1);
-                nouvelleGrille.ajouterJetonDansColonne(joueurCourant.ListeJetons[joueurCourant.nbJetonsRestants], colonne);
-                joueurCourant.nbJetonsRestants --;
+                int colonne = (sc.nextInt() - 1);// on récupère la colonne que le joueur à saisie (-1 pour la valeur dans le tableau)
+                nouvelleGrille.ajouterJetonDansColonne(joueurCourant.ListeJetons[joueurCourant.nbJetonsRestants], colonne);// on ajoute le jeton dans la grille
+                joueurCourant.nbJetonsRestants --;//On diminue de 1 le nombre de jetons du joueur qui vient de jouer 
                 
+                if(nouvelleGrille.etreGagnantePourJoueur(joueurCourant)==true){
+                    //si un joueur est gagnant on affiche sa victoire et on arrête la partie 
+                    finPartie = true;// arrêt de la partie à la fin du tour (while finPartie = false)
+                    joueurGagnant = joueurCourant;
+                    System.out.println("VICTOIRE de "+joueurCourant.nom);
+                    
+                }
                 
+                if(nouvelleGrille.etreRemplie()== true){
+                    //si la grille est pleine on arrête la partie
+                    finPartie = true;
+                }
             }
         }
     

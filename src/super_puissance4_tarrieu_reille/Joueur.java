@@ -16,9 +16,8 @@ public class Joueur {
     
     
     
-    public Joueur(String unNom, String uneCouleur){// constructeur de la classe
+    public Joueur(String unNom){// constructeur de la classe
         nom = unNom;
-        couleur = uneCouleur;
         ListeJetons = new Jeton [21];// creation des references objets Jetons
         nbJetonsRestants = ListeJetons.length;
         nbDesintegrateurs = 0;

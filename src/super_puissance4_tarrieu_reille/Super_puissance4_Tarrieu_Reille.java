@@ -15,7 +15,9 @@ public class Super_puissance4_Tarrieu_Reille {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        // création d'une nouvelle partie
+        Partie nouvellePartie = new Partie();
+        nouvellePartie.débuterPartie();
     }
     
 }
