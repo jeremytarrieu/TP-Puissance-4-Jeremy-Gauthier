@@ -6,9 +6,7 @@ Jeremy Tarrieu
 package super_puissance4_tarrieu_reille;
 import java.util.Random;
 import java.util.Scanner;
-/**
-GrilleJeu : Grille --> Grille de jeu et Jeton à créer avant Partie
- */
+
 public class Partie {
     Joueur ListeJoueurs [] = new Joueur [2];
     Joueur joueurCourant;
@@ -64,6 +62,7 @@ public class Partie {
                 nouvelleGrille.afficherGrilleSurConsole();//on affiche la grille de jeu
                 System.out.println("\t"+ListeJoueurs[i].nom+" entrez le n° de la colonne à jouer : ");
                 
+                sc = new Scanner(System.in);//le joueur entre la ligne à jouer 
                 int colonne = (sc.nextInt() - 1);// on récupère la colonne que le joueur à saisie (-1 pour la valeur dans le tableau)
                 nouvelleGrille.ajouterJetonDansColonne(joueurCourant.ListeJetons[joueurCourant.nbJetonsRestants], colonne);// on ajoute le jeton dans la grille
                 joueurCourant.nbJetonsRestants --;//On diminue de 1 le nombre de jetons du joueur qui vient de jouer 

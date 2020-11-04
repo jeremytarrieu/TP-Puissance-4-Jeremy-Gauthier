@@ -66,16 +66,17 @@ public class Grille {
     }
     
     public void afficherGrilleSurConsole(){
+        
         //pour chaque case de cellule on affiche un O rouge ou jaune s'il y a un jeton rouge ou jaune...
         //... un O noir pour les trous noirs et un O bleu pour une case vide
-        for(int i =5; i>-1; i--){//affichage en commençant par le haut du tableau
-            for(int j =0; j<7; j++){
-                if("rouge".equals(cellules[i][j].lireCouleurDuJeton())){
-                    System.out.print(ANSI_RED + "O" + ANSI_BLACK);
+        for(int i =6; i>-1; i--){//affichage en commençant par le haut du tableau
+            for(int j =0; j<6; j++){
+                if(cellules[i][j] == null){
+                    System.out.print(ANSI_BLUE + "O" + ANSI_BLACK);
                 }else if("jaune".equals(cellules[i][j].lireCouleurDuJeton())){
                     System.out.print(ANSI_YELLOW + "O" + ANSI_BLACK);  
-                }else if(cellules[i][j].jetonCourant == null){
-                    System.out.print(ANSI_BLUE + "O" + ANSI_BLACK);
+                }else if("rouge".equals(cellules[i][j].lireCouleurDuJeton())){
+                    System.out.print(ANSI_RED + "O" + ANSI_BLACK);
                 }else if(cellules[i][j].presenceTrouNoir()){
                     System.out.print(ANSI_BLACK + "O" + ANSI_BLACK);
                 }
