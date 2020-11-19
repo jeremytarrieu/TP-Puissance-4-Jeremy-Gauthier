@@ -17,7 +17,7 @@ public class Super_puissance4_Tarrieu_Reille {
     public static void main(String[] args) {
         // création d'une nouvelle partie
         Partie nouvellePartie = new Partie();
-        nouvellePartie.débuterPartie();
+        nouvellePartie.debuterPartie();
     }
     
 }

@@ -33,7 +33,10 @@ public class Cellule {
    
    public Jeton recupererJeton(){
        // Renvoie la référence du jeton de la Cellule
-       return jetonCourant;
+       // supprime le jeton de la cellule, s'il y en avait un sinon renvoie null
+       Jeton jetonRenvoi = jetonCourant;
+       jetonCourant = null;
+       return jetonRenvoi;
    }
    
    public boolean supprimerJeton(){
@@ -65,10 +68,14 @@ public class Cellule {
        }else{return false;}
    }
    
-   public String lireCouleurDuJeton(){
-       //renvoie la couleur du jeton de la Cellule 
-       return jetonCourant.couleur;
-   }
+    String lireCouleurDuJeton(){
+        //renvoie la couleur du jeton de la cellule 
+        //renvoie vide s'il n'y en a pas 
+        if(jetonCourant == null){
+            return "vide";
+        }
+        return jetonCourant.couleur;
+    }
    
    public boolean recupererDesintegrateur(){
        // recupère un desintegrateur s'il y en a un et renvoie true

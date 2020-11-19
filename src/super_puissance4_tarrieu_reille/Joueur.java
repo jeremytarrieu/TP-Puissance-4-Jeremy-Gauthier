@@ -11,15 +11,14 @@ package super_puissance4_tarrieu_reille;
  */
 public class Joueur {
     String nom, couleur;//nom et couleur du joueur 
-    Jeton [] ListeJetons ; //tableau de jetons, reference aux objets jetons
+    Jeton [] ListeJetons  = new Jeton [21]; //tableau de jetons, reference aux objets jetons
     int nbJetonsRestants, nbDesintegrateurs;//nombre de jetons restants et de desintegrateurs
     
     
     
     public Joueur(String unNom){// constructeur de la classe
         nom = unNom;
-        ListeJetons = new Jeton [21];// creation des references objets Jetons
-        nbJetonsRestants = ListeJetons.length;
+        nbJetonsRestants = 0;
         nbDesintegrateurs = 0;
     }
     
@@ -30,11 +29,7 @@ public class Joueur {
     
     public void ajouterJeton(Jeton unJeton){
         // Remplie du jeton passé en paramètre la première case null dans le tableau de références ListeJetons
-        for(int i =0; i<21; i++){
-            if(ListeJetons[i]==null){
-                ListeJetons[i] = unJeton;
-            }break;
-        }
+        ListeJetons[nbJetonsRestants++] = unJeton;
     }
     
     public void obtenirDesintegrateur(){
@@ -47,5 +42,9 @@ public class Joueur {
         //renvoie faux s'il ne restait plus de desintegrateurs 
         if(nbDesintegrateurs==0){return false;}
         else{nbDesintegrateurs--; return true;}
+    }
+    Jeton retirerJeton(){
+        nbJetonsRestants = nbJetonsRestants-1;
+        return ListeJetons[nbJetonsRestants];
     }
 }
