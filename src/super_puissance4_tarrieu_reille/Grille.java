@@ -10,7 +10,7 @@ package super_puissance4_tarrieu_reille;
  * @author tarri
  */
 public class Grille {
-    Cellule [][] cellules = new Cellule [7][6];//tableau au format [nbcolonne][nblignes] ... (7 colonnes / 6 lignes)
+    Cellule [][] cellules = new Cellule [6][7];//tableau au format [nbcolonne][nblignes] ... (7 colonnes / 6 lignes)
     //variables invariantes, 
     
     
@@ -20,78 +20,84 @@ public class Grille {
     public static final String ANSI_BLUE = "\u001B[34m";
 
     public Grille(){
-        for(int i=0; i<7; i++){
-            for(int j=0;j<6;j++){
+        for(int i=0; i<6; i++){
+            for(int j=0;j<7;j++){
                 cellules[i][j] = new Cellule();
             }
         }
     }
     
-    public boolean ajouterJetonDansColonne(Jeton unJeton, int colonne){
-        // ajoute le jeton dans la colonne ciblée sur la cellule la plus basse et renvoie true
-        // renvoie false si la colonne est pleine
-        boolean b = true;// variable locale prenant la valeur à renvoyer
-        if(cellules[colonne][5] != null){//cas ou la colonne est pleine (la dernière ligne contient une référence Jeton)
-            b = false;
-        }else{//cas ou la colonne n'est pas pleine
-        for(int i =0;i<5;i++){// Dès qu'on rencontre une case vide, on ajoute un jeton
-            if(cellules[colonne][i] == null){
-                cellules[colonne][i].affecterJeton(unJeton);
-                b = true;
-                
-                break;
-            }
-            
+    boolean ajouterJetonDansColonne(Joueur joueurCourant, int ind_colonne) {
+        // si la colonne est remplie, on s'arrete et on retourne false
+        if (colonneRemplie(ind_colonne)) return false;
+        
+        // on recherche l'indice de la ligne où ajouter le jeton
+        // forcement cet inddice existe 
+        int i = 0;
+        while (cellules[i][ind_colonne].jetonCourant != null) {
+            i++;
         }
-        }
-    return b;
+                // on récupére un jeton dans la liste des jetons du joueur 
+        Jeton un_jeton = joueurCourant.retirerJeton();
+        // on ajoute le jeton dans la case en question
+        cellules[i][ind_colonne].jetonCourant = un_jeton;
+        return true;
     }
     
     public boolean etreRemplie(){
         //renvoie true si la grille est pleine, sinon renvoie false
-        for(int i = 0; i<6; i++){
-            if(cellules[i][5] == null){return false;}
-            //on vérifie pour la dernière case de chaque colonne 
-        }
-        return true;
+        // renvoie vrai si la grille est remplie.
+        // il nous suffit de tester si chaque colonne est remplie
+        int compteur = 0;
+        int i=0;
+        // tant que la colonne i est remplie, on incrémente i 
+        // et on passe a la colonne suivante 
+        while (i!=6 && colonneRemplie(i)) { i++;}
+        return (i==6); // si i=6 on a toutes les colonens de remplies 
     }
     
     public void viderGrille(){
         // passe chaque valeur du tableau à null
         for(int i = 0; i<6; i++){
             for(int j = 0; i<5; i++){
-                cellules[i][j] = null;
+                cellules[i][j].jetonCourant = null;
             }
         }
     }
-    
+    // ok 
+    // órdre 
     public void afficherGrilleSurConsole(){
         
         //pour chaque case de cellule on affiche un O rouge ou jaune s'il y a un jeton rouge ou jaune...
         //... un O noir pour les trous noirs et un O bleu pour une case vide
-        for(int i =6; i>-1; i--){//affichage en commençant par le haut du tableau
-            for(int j =0; j<6; j++){
-                if(cellules[i][j] == null){
-                    System.out.print(ANSI_BLUE + "O" + ANSI_BLACK);
+        for(int i =5; i>-1; i--){//affichage en commençant par le haut du tableau
+            for(int j =0; j<7; j++){
+                if(cellules[i][j] == null || cellules[i][j].jetonCourant == null ){
+                    System.out.print(ANSI_BLUE + "O " + ANSI_BLACK);
                 }else if("jaune".equals(cellules[i][j].lireCouleurDuJeton())){
-                    System.out.print(ANSI_YELLOW + "O" + ANSI_BLACK);  
+                    System.out.print(ANSI_YELLOW + "O " + ANSI_BLACK);  
                 }else if("rouge".equals(cellules[i][j].lireCouleurDuJeton())){
-                    System.out.print(ANSI_RED + "O" + ANSI_BLACK);
+                    System.out.print(ANSI_RED + "O " + ANSI_BLACK);
                 }else if(cellules[i][j].presenceTrouNoir()){
-                    System.out.print(ANSI_BLACK + "O" + ANSI_BLACK);
+                    System.out.print(ANSI_BLACK + "O " + ANSI_BLACK);
                 }
             }
+            System.out.println("" +(i+1));
         }
+        for(int i = 0; i<7; i++){
+            System.out.print(""+ (i+1)+" ");
+        }
+        System.out.println();
     }
     
-    public boolean celluleOccupee(int colonne, int hauteur){
+    public boolean celluleOccupee(int ligne, int colonne){
         // Si la case est null -  renvoie false 
         // Sinon - renvoie true
-        return cellules[colonne][hauteur] != null;
+        return cellules[ligne][colonne].jetonCourant != null;
     }
     
-    public String lireCouleurDuJeton(int colonne, int hauteur){
-        return cellules[colonne][hauteur].lireCouleurDuJeton();
+    public String lireCouleurDuJeton(int ligne, int colonne){
+        return cellules[ligne][colonne].lireCouleurDuJeton();
     }
     
     public boolean etreGagnantePourJoueur(Joueur unJoueur){
@@ -106,41 +112,53 @@ public class Grille {
     int i, j;
     String pion = unJoueur.couleur;// valeur de la couleur de la cellule
     
-    for(i = 0; i<4; i++){// vertical
-        for(j = 0; j<5; j++){
-            if(cellules[i][j].jetonCourant.couleur.equals(pion) && cellules[i][j+1].jetonCourant.couleur.equals(pion)&& cellules[i][j+2].jetonCourant.couleur.equals(pion) && cellules[i][j+3].jetonCourant.couleur.equals(pion)){
+    for(i = 0; i<6; i++){// vertical
+        for(j = 0; j<4; j++){
+            if(cellules[i][j] != null && cellules[i][j].lireCouleurDuJeton().equals(pion) 
+                    && cellules[i][j+1] != null && cellules[i][j+1].lireCouleurDuJeton().equals(pion)
+                    && cellules[i][j+2] != null && cellules[i][j+2].lireCouleurDuJeton().equals(pion) 
+                    &&cellules[i][j+3] != null && cellules[i][j+3].lireCouleurDuJeton().equals(pion)){
                 return true;
             }   
         }   
     }
-    for(i = 0; i<6; i++){// horizontal
-        for(j = 0; j<3; j++){         
-            if(cellules[i][j].jetonCourant.couleur.equals(pion) && cellules[i+1][j].jetonCourant.couleur.equals(pion)&& cellules[i+2][j].jetonCourant.couleur.equals(pion) && cellules[i+3][j].jetonCourant.couleur.equals(pion)){
+    for(i = 0; i<3; i++){// horizontal
+        for(j = 0; j<7; j++){         
+            if(cellules[i][j] != null && cellules[i][j].lireCouleurDuJeton().equals(pion) 
+                    && cellules[i+1][j] != null && cellules[i+1][j].lireCouleurDuJeton().equals(pion)
+                    && cellules[i+2][j] != null && cellules[i+2][j].lireCouleurDuJeton().equals(pion) 
+                    &&cellules[i+3][j] != null && cellules[i+3][j].lireCouleurDuJeton().equals(pion)){
                 return true;
             }
         }
     }
-    for(i = 0; i<4; i++){//diagonale 1
-        for(j = 3; j<6;j++){
-            if(cellules[i][j].jetonCourant.couleur.equals(pion) && cellules[i+1][j+1].jetonCourant.couleur.equals(pion)&& cellules[i+2][j+2].jetonCourant.couleur.equals(pion) && cellules[i+3][j+3].jetonCourant.couleur.equals(pion)){
+    for(i = 0; i<3; i++){//diagonale 1
+        for(j = 3; j<4;j++){
+            if(cellules[i][j] != null && cellules[i][j].lireCouleurDuJeton().equals(pion) 
+                    && cellules[i+1][j+1] != null && cellules[i+1][j+1].lireCouleurDuJeton().equals(pion)
+                    && cellules[i+2][j+2] != null && cellules[i+2][j+2].lireCouleurDuJeton().equals(pion) 
+                    &&cellules[i+3][j+3] != null && cellules[i+3][j+3].lireCouleurDuJeton().equals(pion)){
             return true;
             }
         }
     }
-        for(i = 0; i<4; i++){//diagonale 1
-        for(j = 0; j<3;j++){
-            if(cellules[i][j].jetonCourant.couleur.equals(pion) && cellules[i+1][j-1].jetonCourant.couleur.equals(pion)&& cellules[i+2][j-2].jetonCourant.couleur.equals(pion) && cellules[i+3][j-3].jetonCourant.couleur.equals(pion)){
-            return true;
+        for(i = 3; i<6; i++){//diagonale 2
+            for(j = 0; j<4;j++){
+                if(cellules[i][j] != null && cellules[i][j].lireCouleurDuJeton().equals(pion) 
+                        && cellules[i-1][j+1] != null && cellules[i-1][j+1].lireCouleurDuJeton().equals(pion)
+                        && cellules[i-2][j+2] != null && cellules[i-2][j+2].lireCouleurDuJeton().equals(pion) 
+                        && cellules[i-3][j+3] != null && cellules[i-3][j+3].lireCouleurDuJeton().equals(pion)){
+                return true;
             }
         }
     }
         return false;// Si aucun des test n'a renvoyé true, c'est que le joueur n'a pas gagné, on renvoie donc false
     }
     
-    public void tasserGrille(int colonne){
+    public void tasserColonne(int colonne){
         //tasse la grille pour un colonne donnée 
         for(int i =0;i<6;i++){//pour chaque ligne de la colonne
-            if(cellules[colonne][i]==null){//on vérifie si une cellule ne référence pas dejeton
+            if(cellules[colonne][i].jetonCourant==null){//on vérifie si une cellule ne référence pas dejeton
                 for(int j = i;j<5;j++){//auqeul cas on décale toutes les valeurs vers le bas 
                     cellules[colonne][j] = cellules[colonne][j+1];
                 }
@@ -148,13 +166,15 @@ public class Grille {
             }
             }
         }
+    public void tasserGrille(){// tasse chaque colonne de la grille
+            for (int i = 0; i < 7; i++) {
+           tasserColonne(i);
+        }
+    }
     
     public boolean colonneRemplie(int colonne){
         //Si une colonne de cellules n'a aucun élément null, on renvoie vrai, sinon faut 
-        for(int i = 0; i<5;i++){
-            if(cellules[colonne][i]==null){return false;}
-        }
-        return true;
+        return (cellules[5][colonne].recupererJeton() != null);
     }
     
     public boolean placerTrouNoir(int colonne, int ligne){
@@ -169,12 +189,19 @@ public class Grille {
     return cellules[colonne][ligne].placerDesintegrateur();
     }
     
-    public boolean supprimerJeton(int colonne, int ligne){
-        //appelle la fonction supprimer Jeton de Cellule
-        return cellules[colonne][ligne].supprimerJeton();
+    public boolean supprimerJeton(int ligne, int colonne){
+        // si le jeton n'existait pas on renvoie false
+        //sinon on retire sa référence et renvoie true
+        if (cellules[ligne][colonne].jetonCourant == null) {
+            return false;
+        }
+        cellules[ligne][colonne].jetonCourant = null;
+        return true;
     }
     
-    public Jeton recupererJeton(int colonne, int ligne){
-        return cellules[colonne][ligne].recupererJeton();
+    public Jeton recupererJeton(int ligne, int colonne){
+        Jeton jetonRenvoi = cellules[ligne][colonne].recupererJeton();
+        cellules[ligne][colonne].supprimerJeton();
+        return jetonRenvoi;
     }
     }
