@@ -41,7 +41,30 @@ public class Grille {
         Jeton un_jeton = joueurCourant.retirerJeton();
         // on ajoute le jeton dans la case en question
         cellules[i][ind_colonne].jetonCourant = un_jeton;
+                // on récupère un potentiel désintegrateur
+        if (cellules[i][ind_colonne].presenceDesintegrateur()) {
+            cellules[i][ind_colonne].recupererDesintegrateur();
+            joueurCourant.nbDesintegrateurs++;
+        }
+        // on active le potentiel trou noir
+        if (cellules[i][ind_colonne].presenceTrouNoir()) {
+           cellules[i][ind_colonne].activerTrouNoir();
+        }
         return true;
+    }
+        void activer_trounoir(int column) { // ressort vrai si il y a un desing
+        int i = 5;
+        while (cellules[i][column].jetonCourant == null) {
+            i--;
+            if (i == 0) {
+                break;
+            }
+        }
+        if (i >= 0 && i < 6) {
+            cellules[i][column].activerTrouNoir();
+        }
+        
+
     }
     
     public boolean etreRemplie(){
@@ -61,6 +84,8 @@ public class Grille {
         for(int i = 0; i<6; i++){
             for(int j = 0; i<5; i++){
                 cellules[i][j].jetonCourant = null;
+                cellules[i][j].trouNoir = false;
+                cellules[i][j].desintegrateur = false;
             }
         }
     }
@@ -72,14 +97,14 @@ public class Grille {
         //... un O noir pour les trous noirs et un O bleu pour une case vide
         for(int i =5; i>-1; i--){//affichage en commençant par le haut du tableau
             for(int j =0; j<7; j++){
-                if(cellules[i][j] == null || cellules[i][j].jetonCourant == null ){
-                    System.out.print(ANSI_BLUE + "O " + ANSI_BLACK);
-                }else if("jaune".equals(cellules[i][j].lireCouleurDuJeton())){
-                    System.out.print(ANSI_YELLOW + "O " + ANSI_BLACK);  
-                }else if("rouge".equals(cellules[i][j].lireCouleurDuJeton())){
-                    System.out.print(ANSI_RED + "O " + ANSI_BLACK);
+                if("jaune".equals(cellules[i][j].lireCouleurDuJeton())){
+                    System.out.print(ANSI_YELLOW + "O " + ANSI_BLACK); 
                 }else if(cellules[i][j].presenceTrouNoir()){
                     System.out.print(ANSI_BLACK + "O " + ANSI_BLACK);
+                }else if("rouge".equals(cellules[i][j].lireCouleurDuJeton())){
+                    System.out.print(ANSI_RED + "O " + ANSI_BLACK);
+                }else if(cellules[i][j] == null || cellules[i][j].jetonCourant == null ){
+                    System.out.print(ANSI_BLUE + "O " + ANSI_BLACK);
                 }
             }
             System.out.println("" +(i+1));
@@ -155,17 +180,19 @@ public class Grille {
         return false;// Si aucun des test n'a renvoyé true, c'est que le joueur n'a pas gagné, on renvoie donc false
     }
     
-    public void tasserColonne(int colonne){
-        //tasse la grille pour un colonne donnée 
-        for(int i =0;i<6;i++){//pour chaque ligne de la colonne
-            if(cellules[colonne][i].jetonCourant==null){//on vérifie si une cellule ne référence pas dejeton
-                for(int j = i;j<5;j++){//auqeul cas on décale toutes les valeurs vers le bas 
-                    cellules[colonne][j] = cellules[colonne][j+1];
+       void tasserColonne(int colonne) {
+        for (int i = 0; i < 6; i++) {
+            if (i == 5) {
+                cellules[i][colonne].jetonCourant = null;
+            } else {
+                if (cellules[i][colonne].jetonCourant  == null) {
+                  cellules[i][colonne].jetonCourant = cellules[i + 1][colonne].jetonCourant;
+                  cellules[i + 1][colonne].jetonCourant=null;
                 }
-            cellules[colonne][5] = null;//Rajoute une référence nulle sur la dèrnière case car il n'y a pas encire de jeton
             }
-            }
+
         }
+    }
     public void tasserGrille(){// tasse chaque colonne de la grille
             for (int i = 0; i < 7; i++) {
            tasserColonne(i);
@@ -177,16 +204,21 @@ public class Grille {
         return (cellules[5][colonne].recupererJeton() != null);
     }
     
-    public boolean placerTrouNoir(int colonne, int ligne){
-        /*appelle la fonction TrouNoir de Cellule, 
-        s'il n'y avait pas de trou noir alors on en ajoute un et on renvoie true, 
-        s'il n'y en avait pas on renvoie false*/
-        return cellules[colonne][ligne].placerTrouNoir();
+    public boolean placerTrouNoir(int ligne, int colonne){
+        if (!cellules[ligne][colonne].trouNoir) {
+            cellules[ligne][colonne].trouNoir = true;
+            return true;
+        }
+        return false;
+  
     }
     
-    public boolean placerDesintegrateur(int colonne, int ligne){
-    //même démarche que pour placer TrouNoir...
-    return cellules[colonne][ligne].placerDesintegrateur();
+    public boolean placerDesintegrateur(int ligne, int colonne){
+    if (!cellules[ligne][colonne].desintegrateur) {
+            cellules[ligne][colonne].desintegrateur = true;
+            return true;
+    }
+    return false;
     }
     
     public boolean supprimerJeton(int ligne, int colonne){
