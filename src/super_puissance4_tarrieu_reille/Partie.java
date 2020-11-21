@@ -95,9 +95,10 @@ public class Partie {
         Scanner sc = new Scanner(System.in);
         System.out.println("Que voulez-vous faire ?");
         System.out.println("1) Jouer un Jeton");
-        System.out.println("2) Désintégrer un Jeton");
+        System.out.println("2) Récuperer un Jeton");
+        System.out.println("3) Désintégrer un Jeton");
         int choix = sc.nextInt();
-        while (choix > 2 || choix < 1) {
+        while (choix > 3 || choix < 1) {
             System.out.println("Erreur : Entrer un choix qui existe :");
             choix = sc.nextInt();
         }
@@ -121,6 +122,36 @@ public class Partie {
             resultatAction = nouvelleGrille.ajouterJetonDansColonne(joueurCourant, colonne);
         }
     }
+    
+    boolean recup_jeton() {
+        int colonne;
+        int ligne;
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Veuillez saisir les coordonnées du jeton a récup :");
+        System.out.println("Veuillez saisir la colonne :");
+        colonne = sc.nextInt() - 1;
+        while (colonne > 6 || colonne < 0) {
+            System.out.println("Erreur : veuillez saisir une colonne valide :");
+            colonne = sc.nextInt() - 1;
+        }
+        System.out.println("Veuillez saisir la ligne :");
+        ligne = sc.nextInt() - 1;
+        while (ligne > 5 || ligne < 0) {
+            System.out.println("Erreur : veuillez saisir une ligne valide :");
+            ligne = sc.nextInt() - 1;
+        }
+        if (nouvelleGrille.cellules[ligne][colonne].jetonCourant != null && nouvelleGrille.cellules[ligne][colonne].lireCouleurDuJeton().equals(joueurCourant.couleur)) {
+            //G.recupererJeton(ligne, colonne);
+            joueurCourant.ajouterJeton(nouvelleGrille.recupererJeton(ligne, colonne));
+            nouvelleGrille.tasserGrille();
+            //JoueurCourant.ajouterJeton(G.cellules[ligne][colonne].recupererJeton());
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     boolean tour_de_jeux() {
         System.out.println("C'est a " + joueurCourant.nom + " de jouer (" + joueurCourant.couleur + ")");
         System.out.println("Il vous reste " + joueurCourant.nbJetonsRestants + " jetons");
@@ -130,7 +161,14 @@ public class Partie {
             case 1:
                 jouerJeton();
                 return true;
-            case 2:
+                case 2:
+                if (!recup_jeton()) {
+                    System.out.println("Vous avez soit saisi un jeton qui n'est pas le vôtre ou un endroit sans jeton");
+                    return false;
+                }
+
+                break;
+            case 3:
                 if (!désing_jeton()) {
                     System.out.println("Vous avez soit saisi un jeton qui est le vôtre ou vous n'avez pas de désintégrateur");
                     return false;
